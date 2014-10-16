@@ -25,109 +25,104 @@
 
 #include"all_gene_topo.hpp"
 
-
-vector < string > find_current_taxa_name( string in_str ){
-	vector < string > current_taxa_name;
-	for (size_t i=1;i<in_str.size();){
-		if (isalpha(in_str[i]) || isdigit(in_str[i])){
-			string label=extract_label(in_str, i);
-			current_taxa_name.push_back(label);
-			i=label.size()+i;
-		}
-		else {
-			i++;
-		}
-	}
-	return current_taxa_name;
+size_t GeneTopoList::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
+    size_t j = i;
+    int num_b = 0;
+    for ( ; j > 0 ; j-- ){
+        if      ( in_str[j] == '(' ) num_b--;
+        else if ( in_str[j] == ')' ) num_b++;
+        else continue;
+        if ( num_b == 0 ) break;
+    }
+    return j;
 }
 
 
-string add_new_taxa_at_tip(string in_str,size_t i, size_t tax_i, vector <string> taxa_name,string label){
-	string out_str=in_str;			
-	string new_add_in="("+label+","+taxa_name[tax_i]+")";				
-	out_str.replace(i,label.size(),new_add_in);
+string GeneTopoList::add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to ){
+	string out_str = in_str;
+	string new_cherry = "(" + newly_added + "," + added_to + ")";
+	out_str.replace( i, added_to.size(), new_cherry );
 	return out_str;
 }
 
 
-string add_new_taxa_at_int(string in_str, size_t i, size_t tax_i, vector <string> taxa_name){
-	string out_str=in_str;
-	size_t rev_dummy_i=Parenthesis_balance_index_backwards(in_str,i);
-	size_t substr_len=i-rev_dummy_i+1;
-	string new_add_in=in_str.substr(rev_dummy_i,substr_len);
-	new_add_in="("+new_add_in+","+taxa_name[tax_i]+")";
-	out_str.replace(rev_dummy_i,substr_len,new_add_in);
+string GeneTopoList::add_new_taxa_at_int(string &in_str, size_t i, string &newly_added ){
+	string out_str = in_str;
+	size_t rev_dummy_i = this->Parenthesis_balance_index_backwards( in_str, i);
+	size_t substr_len = i - rev_dummy_i + 1;
+	string new_add_in = in_str.substr( rev_dummy_i, substr_len);
+	new_add_in = "(" + new_add_in + "," + newly_added + ")";
+	out_str.replace( rev_dummy_i, substr_len, new_add_in);
 	return out_str;
-	
 }
 
 
-/*! \fn vector <string> generate_new_topo_list(vector <string> old_topo_list, size_t tax_num)
-* \brief Enumerate new tree topologies for k+1 taxon given tree topologies for k taxon 
-* \return the list of \a n taxon topologies 
-*/
-vector <string> generate_new_topo_list(
-vector <string> old_topo_list /*! topology list which is about to be updated */,
-vector <string> taxa_name /*! list of taxa names */)
-{
-	//size_t tax_num=taxa_name.size();
-	vector <string> new_topo_list;
-	vector <string> out_topo_list;
-	vector < string > current_taxa_name=find_current_taxa_name(old_topo_list[0]);
-			
-	if (current_taxa_name.size()<taxa_name.size()){
-		for (size_t i=0;i<old_topo_list.size();i++){
-			string old_topo_list_dummy=old_topo_list[i];
-			for (size_t i_str_len=1;i_str_len<old_topo_list_dummy.size();){				
-				if ( isalpha(old_topo_list_dummy[i_str_len]) || isdigit(old_topo_list_dummy[i_str_len])){
-					 
-					string label=extract_label(old_topo_list_dummy, i_str_len);
-					//string new_topo_list_dummy=old_topo_list_dummy;			
-					//string new_add_in="("+label+","+taxa_name[current_taxa_name.size()]+")";				
-					//new_topo_list_dummy.replace(i_str_len,label.size(),new_add_in);
-					
-					string new_topo_list_dummy=add_new_taxa_at_tip(old_topo_list_dummy,i_str_len, current_taxa_name.size(), taxa_name,label);
-					new_topo_list.push_back(new_topo_list_dummy);
-					i_str_len=label.size()+i_str_len;
+string GeneTopoList::extract_label( string &in_str, size_t i ){
+    size_t j = this->end_of_label_or_bl(in_str, i);
+    return in_str.substr( i, j + 1 - i );
+}
+
+
+size_t GeneTopoList::end_of_label_or_bl( string &in_str, size_t i ){
+    for ( size_t j = i; j < in_str.size(); j++){
+        if      ( in_str[j+1] == ',' )    return j;
+        else if ( in_str[j+1] == ')' )    return j;
+        else if ( in_str[j+1] == ':' )    return j;
+        else if ( in_str[j+1] == ';' )    return j;
+        else continue;
+    }
+}
+
+
+GeneTopoList::GeneTopoList( string tree_str ){
+    this->extract_TipLabels_from_TreeStr ( tree_str );
+    assert ( this->TipLabels.size() >= 2 ) ;
+    this->init();
+    if ( this->TipLabels.size() == 2 ) return;
+    
+    for ( size_t tip_i = 2; tip_i < this->TipLabels.size() ; tip_i++ ){
+        
+        this->TreeList_tmp.clear();
+        for ( size_t i = 0 ; i < this->TreeList.size(); i++ ){
+            this->str_tmp = this->TreeList[i];
+            for ( size_t i_str_len = 1; i_str_len < this->str_tmp.size(); ){
+				if ( isalpha( this->str_tmp[i_str_len] ) || isdigit( this->str_tmp[i_str_len]) ){
+					string label = extract_label( this->str_tmp, i_str_len);
+					string new_topo = add_new_taxa_at_tip( str_tmp, i_str_len, this->TipLabels[tip_i], label);
+					TreeList_tmp.push_back(new_topo);
+					i_str_len = label.size() + i_str_len;
 				}
 				else{
-					if (old_topo_list_dummy[i_str_len]==')'){
-						//size_t rev_dummy_i=Parenthesis_balance_index_backwards(old_topo_list_dummy,i_str_len);
-						//size_t substr_len=i_str_len-rev_dummy_i+1;
-						//string new_topo_list_dummy=old_topo_list_dummy;					
-						//string new_add_in=old_topo_list_dummy.substr(rev_dummy_i,substr_len);
-						//new_add_in="("+new_add_in+","+taxa_name[current_taxa_name.size()]+")";
-						//new_topo_list_dummy.replace(rev_dummy_i,substr_len,new_add_in);
-						
-						string new_topo_list_dummy=add_new_taxa_at_int(old_topo_list_dummy, i_str_len, current_taxa_name.size(), taxa_name);
-						new_topo_list.push_back(new_topo_list_dummy);					
+					if ( this->str_tmp[i_str_len]==')' ){
+						string new_topo = add_new_taxa_at_int( str_tmp, i_str_len, this->TipLabels[tip_i]);
+						TreeList_tmp.push_back( new_topo );
 					}
 					i_str_len++;
 				}
 			}
-		}
-	}
-	
-	if ((current_taxa_name.size()+1)<taxa_name.size()){
-		out_topo_list=generate_new_topo_list(new_topo_list, taxa_name);
-	}
-	else{
-		out_topo_list=new_topo_list;
-	}
-
-	return out_topo_list;
+        }
+        
+        this->TreeList.clear();
+        this->TreeList = this->TreeList_tmp;
+    }
 }
 
 
-/*! \fn vector <string> all_n_tax_gene_tree(size_t tax_num)
- * \brief Enumerate all possible topologies for n taxon 
- * \return the list of \a n taxon topologies*/
-vector <string> all_n_tax_gene_tree(vector <string> taxa_name/*! list of taxa names */){
-	vector < string > old_topo_list;
-	vector < string > new_topo_list;
-	string first_topo="("+taxa_name[0]+","+taxa_name[1]+")";
-	old_topo_list.push_back(first_topo);
-	new_topo_list=generate_new_topo_list(old_topo_list, taxa_name);
-	return new_topo_list;
+void GeneTopoList::extract_TipLabels_from_TreeStr( string &in_str ){
+	for ( size_t i = 1; i < in_str.size(); ){
+		if ( isalpha(in_str[i]) || isdigit(in_str[i]) ){
+			string label = extract_label( in_str, i );
+			this->TipLabels.push_back(label);
+			i += label.size();
+		} else {
+			i++;
+		}
+	}
+}
+
+
+void GeneTopoList::init(){
+	string init_topo = "(" + this->TipLabels[0] + "," + this->TipLabels[1] + ")";
+    this->TreeList.push_back ( init_topo );
 }
 
