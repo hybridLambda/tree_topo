@@ -25,6 +25,44 @@
 
 #include"all_gene_topo.hpp"
 
+//GeneTopoList::GeneTopoList( string tree_str ){
+GeneTopoList::GeneTopoList( vector < string > &TipLabels_in ){
+    this->TipLabels = TipLabels_in;
+    //this->extract_TipLabels_from_TreeStr ( tree_str );
+    assert ( this->TipLabels.size() >= 2 ) ;
+    this->init();
+    if ( this->TipLabels.size() == 2 ) return;
+    for ( size_t tip_i = 2; tip_i < this->TipLabels.size() ; tip_i++ ){
+        
+        this->TreeList_tmp.clear();
+        for ( size_t i = 0 ; i < this->TreeList.size(); i++ ){
+            this->str_tmp = this->TreeList[i];
+            for ( size_t i_str_len = 1; i_str_len < this->str_tmp.size(); ){
+				if ( isalpha( this->str_tmp[i_str_len] ) || isdigit( this->str_tmp[i_str_len]) ){
+					string label = extract_label( this->str_tmp, i_str_len);
+					string new_topo = add_new_taxa_at_tip( str_tmp, i_str_len, this->TipLabels[tip_i], label);
+                    GeneTopoListdout << new_topo << endl;
+					TreeList_tmp.push_back(new_topo);
+					i_str_len = label.size() + i_str_len;
+				}
+				else{
+					if ( this->str_tmp[i_str_len]==')' ){
+						string new_topo = add_new_taxa_at_int( str_tmp, i_str_len, this->TipLabels[tip_i]);
+					    GeneTopoListdout << new_topo << endl;
+                    	TreeList_tmp.push_back( new_topo );
+					}
+					i_str_len++;
+				}
+			}
+        }
+        
+        this->TreeList.clear();
+        this->TreeList = this->TreeList_tmp;
+    }
+    this->finalize();
+}
+
+
 size_t GeneTopoList::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
     size_t j = i;
     int num_b = 0;
@@ -35,6 +73,12 @@ size_t GeneTopoList::Parenthesis_balance_index_backwards( string &in_str, size_t
         if ( num_b == 0 ) break;
     }
     return j;
+}
+
+
+void GeneTopoList::finalize(){
+    for ( size_t i = 0 ; i < this->TreeList.size(); i++ )
+        this->TreeList[i] += ";";    
 }
 
 
@@ -74,44 +118,11 @@ size_t GeneTopoList::end_of_label_or_bl( string &in_str, size_t i ){
 }
 
 
-GeneTopoList::GeneTopoList( string tree_str ){
-    this->extract_TipLabels_from_TreeStr ( tree_str );
-    assert ( this->TipLabels.size() >= 2 ) ;
-    this->init();
-    if ( this->TipLabels.size() == 2 ) return;
-    
-    for ( size_t tip_i = 2; tip_i < this->TipLabels.size() ; tip_i++ ){
-        
-        this->TreeList_tmp.clear();
-        for ( size_t i = 0 ; i < this->TreeList.size(); i++ ){
-            this->str_tmp = this->TreeList[i];
-            for ( size_t i_str_len = 1; i_str_len < this->str_tmp.size(); ){
-				if ( isalpha( this->str_tmp[i_str_len] ) || isdigit( this->str_tmp[i_str_len]) ){
-					string label = extract_label( this->str_tmp, i_str_len);
-					string new_topo = add_new_taxa_at_tip( str_tmp, i_str_len, this->TipLabels[tip_i], label);
-					TreeList_tmp.push_back(new_topo);
-					i_str_len = label.size() + i_str_len;
-				}
-				else{
-					if ( this->str_tmp[i_str_len]==')' ){
-						string new_topo = add_new_taxa_at_int( str_tmp, i_str_len, this->TipLabels[tip_i]);
-						TreeList_tmp.push_back( new_topo );
-					}
-					i_str_len++;
-				}
-			}
-        }
-        
-        this->TreeList.clear();
-        this->TreeList = this->TreeList_tmp;
-    }
-}
-
-
 void GeneTopoList::extract_TipLabels_from_TreeStr( string &in_str ){
 	for ( size_t i = 1; i < in_str.size(); ){
 		if ( isalpha(in_str[i]) || isdigit(in_str[i]) ){
 			string label = extract_label( in_str, i );
+            GeneTopoListdout << label << endl;
 			this->TipLabels.push_back(label);
 			i += label.size();
 		} else {
@@ -123,6 +134,6 @@ void GeneTopoList::extract_TipLabels_from_TreeStr( string &in_str ){
 
 void GeneTopoList::init(){
 	string init_topo = "(" + this->TipLabels[0] + "," + this->TipLabels[1] + ")";
+    GeneTopoListdout << init_topo << endl;
     this->TreeList.push_back ( init_topo );
 }
-

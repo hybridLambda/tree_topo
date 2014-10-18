@@ -30,25 +30,41 @@
 #include <cassert>
 //#include <deque>
 
+#ifndef NDEBUG
+#define dout std::cout
+#else
+#pragma GCC diagnostic ignored "-Wunused-value"
+#define dout 0 && std::cout
+#endif
+
+#ifndef NDEBUG
+#define GeneTopoListdout (std::cout << "      GeneTopoList ")
+#else
+#pragma GCC diagnostic ignored "-Wunused-value"
+#define GeneTopoListdout 0 && (std::cout << "      GeneTopoList ")
+#endif
+
 using namespace std;
 
 class GeneTopoList {
-    private:
-        vector < string > TipLabels;
-        void extract_TipLabels_from_TreeStr ( string &tree_str );
-        //deque < string > TreeList;
-        vector < string > TreeList;
-        vector < string > TreeList_tmp;
-        string str_tmp;
-        size_t end_of_label_or_bl( string &in_str, size_t i );
-        string extract_label( string &in_str, size_t i);
-        void init();
-        string add_new_taxa_at_int(string &in_str, size_t i, string &newly_added );
-        string add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to );
-        size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
-    public:
-        //GeneTopoList ( size_t NumberOfTaxa );
-        GeneTopoList ( string tree_str );
-        ~GeneTopoList(){};
+    friend class HybridCoal;
+    vector < string > TipLabels;
+    //deque < string > TreeList;
+    vector < string > TreeList;
+    vector < string > TreeList_tmp;
+    string str_tmp;
+    void init();
+    string add_new_taxa_at_int(string &in_str, size_t i, string &newly_added );
+    string add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to );
+    size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
+    size_t end_of_label_or_bl( string &in_str, size_t i );
+    string extract_label( string &in_str, size_t i);
+    void extract_TipLabels_from_TreeStr ( string &tree_str );
+    void finalize();
+
+    //GeneTopoList ( size_t NumberOfTaxa );
+    //GeneTopoList ( string tree_str );
+    GeneTopoList ( vector < string > &TipLabels_in );
+    ~GeneTopoList(){};
 };
 
