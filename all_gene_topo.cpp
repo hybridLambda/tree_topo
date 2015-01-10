@@ -31,6 +31,12 @@ GeneTopoList::GeneTopoList( vector < string > &TipLabels_in ){
     //this->extract_TipLabels_from_TreeStr ( tree_str );
     assert ( this->TipLabels.size() >= 2 ) ;
     this->init();
+    this->core();
+    this->finalize();
+}
+
+
+void GeneTopoList::core(){
     if ( this->TipLabels.size() == 2 ) return;
     for ( size_t tip_i = 2; tip_i < this->TipLabels.size() ; tip_i++ ){
         
@@ -59,9 +65,7 @@ GeneTopoList::GeneTopoList( vector < string > &TipLabels_in ){
         this->TreeList.clear();
         this->TreeList = this->TreeList_tmp;
     }
-    this->finalize();
 }
-
 
 size_t GeneTopoList::Parenthesis_balance_index_backwards( string &in_str, size_t i ){
     size_t j = i;

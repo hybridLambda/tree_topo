@@ -21,7 +21,7 @@
 */
 
 /*! \file all_gene_topo.hpp
- * 	\brief Header file for all_gene_topo.cpp */
+ *  \brief Header file for all_gene_topo.cpp */
 
 
 #include <iostream>
@@ -48,6 +48,7 @@ using namespace std;
 
 class GeneTopoList {
     friend class HybridCoal;
+    friend class TopoApp;
     //deque < string > TreeList;
     vector < string > TreeList;
     vector < string > TipLabels;
@@ -60,12 +61,60 @@ class GeneTopoList {
     string extract_label( string &in_str, size_t i);
 
     void init();
+    void core();
     void extract_TipLabels_from_TreeStr ( string &tree_str );
     void finalize();
 
     //GeneTopoList ( size_t NumberOfTaxa );
     //GeneTopoList ( string tree_str );
+    GeneTopoList (){};
     GeneTopoList ( vector < string > &TipLabels_in );
     ~GeneTopoList(){};
+};
+
+
+class TopoApp {
+    int argc_;
+    int argc_i;
+    char * const* argv_;
+    string tmp_input_str;
+    string prefix;
+    GeneTopoList * topo_list_;
+
+    void init(){
+        argc_i = 1;
+        topo_list_ = new GeneTopoList();
+    }
+
+    void parse(){
+        if ( argc_ == 1 ){
+            cout << "print help "<<endl;
+            return;
+        }
+
+        while ( argc_i < argc_ ){
+            std::string argv_i ( argv_[argc_i] );
+            topo_list_->TipLabels.push_back( argv_i );
+            argc_i++;
+        }
+    }
+
+    void finalize(){
+        if ( topo_list_->TreeList.size() > 1 ) 
+            topo_list_ ->init();
+        topo_list_ ->core();
+        for ( size_t i = 0; i < topo_list_->TreeList.size(); i++){
+            cout << topo_list_->TreeList[i] << endl;
+        }
+    }
+
+
+  public:
+    TopoApp ( int argc, char *argv[] ) : argc_(argc), argv_(argv) {
+        this->init();
+        this->parse();
+        this->finalize();
+    }
+    ~TopoApp () { delete this->topo_list_; }
 };
 
