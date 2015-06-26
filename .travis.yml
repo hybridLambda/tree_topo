@@ -10,7 +10,7 @@ compiler:
 before_install:
   - echo $LANG
   - echo $LC_ALL
-  - sudo apt-get install -qqy automake g++-4.8 libcppunit-dev valgrind
+  - sudo apt-get install -qqy libcppunit-dev valgrind
 
 script:
   - make
