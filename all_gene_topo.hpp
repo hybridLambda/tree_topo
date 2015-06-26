@@ -48,17 +48,18 @@ using namespace std;
 
 class GeneTopoList {
     friend class HybridCoal;
-    vector < string > TipLabels;
     //deque < string > TreeList;
     vector < string > TreeList;
+    vector < string > TipLabels;
     vector < string > TreeList_tmp;
-    string str_tmp;
-    void init();
-    string add_new_taxa_at_int(string &in_str, size_t i, string &newly_added );
-    string add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to );
     size_t Parenthesis_balance_index_backwards( string &in_str, size_t i );
     size_t end_of_label_or_bl( string &in_str, size_t i );
+    string str_tmp;
+    string add_new_taxa_at_int(string &in_str, size_t i, string &newly_added );
+    string add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to );
     string extract_label( string &in_str, size_t i);
+
+    void init();
     void extract_TipLabels_from_TreeStr ( string &tree_str );
     void finalize();
 
