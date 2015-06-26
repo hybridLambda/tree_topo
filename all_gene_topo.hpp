@@ -1,11 +1,11 @@
 /*
- * hybrid-Lambda is used to simulate gene trees given species network under 
+ * hybrid-Lambda is used to simulate gene trees given species network under
  * coalescent process.
- * 
- * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
- * 
+ *
+ * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
+ *
  * This file is part of hybrid-Lambda.
- * 
+ *
  * hybrid-Lambda is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -49,6 +49,7 @@ using namespace std;
 class GeneTopoList {
     friend class HybridCoal;
     friend class TopoApp;
+    friend class TestGeneTopoList;
     //deque < string > TreeList;
     vector < string > TreeList;
     vector < string > TipLabels;
@@ -59,7 +60,8 @@ class GeneTopoList {
     string add_new_taxa_at_int(string &in_str, size_t i, string &newly_added );
     string add_new_taxa_at_tip(string &in_str, size_t i, string &newly_added, string added_to );
     string extract_label( string &in_str, size_t i);
-
+    
+    void run();
     void init();
     void core();
     void extract_TipLabels_from_TreeStr ( string &tree_str );
@@ -88,7 +90,7 @@ class TopoApp {
 
     void parse(){
         if ( argc_ == 1 ){
-            cout << "print help "<<endl;
+            cout << "USEAGE: ./topo a b c d e "<<endl;
             return;
         }
 
@@ -100,9 +102,11 @@ class TopoApp {
     }
 
     void finalize(){
-        if ( topo_list_->TreeList.size() > 1 ) 
-            topo_list_ ->init();
-        topo_list_ ->core();
+        if ( topo_list_->TipLabels.size() > 1 ) {
+            topo_list_ ->run();
+        } {
+            cout << " Please provide at least two taxon names." <<endl;
+        }
         for ( size_t i = 0; i < topo_list_->TreeList.size(); i++){
             cout << topo_list_->TreeList[i] << endl;
         }

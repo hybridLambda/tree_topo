@@ -1,11 +1,11 @@
 /*
- * hybrid-Lambda is used to simulate gene trees given species network under 
+ * hybrid-Lambda is used to simulate gene trees given species network under
  * coalescent process.
- * 
- * Copyright (C) 2010 -- 2014 Sha (Joe) Zhu
- * 
+ *
+ * Copyright (C) 2010 -- 2015 Sha (Joe) Zhu
+ *
  * This file is part of hybrid-Lambda.
- * 
+ *
  * hybrid-Lambda is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,13 +23,18 @@
 /*! \file all_gene_topo.cpp
  *     \brief  Enumerate all possible tree topologies for given number of taxon */
 
-#include"all_gene_topo.hpp"
+#include "all_gene_topo.hpp"
 
 //GeneTopoList::GeneTopoList( string tree_str ){
 GeneTopoList::GeneTopoList( vector < string > &TipLabels_in ){
     this->TipLabels = TipLabels_in;
     //this->extract_TipLabels_from_TreeStr ( tree_str );
     assert ( this->TipLabels.size() >= 2 ) ;
+    this->run();
+}
+
+
+void GeneTopoList::run(){
     this->init();
     this->core();
     this->finalize();
