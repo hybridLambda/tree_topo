@@ -15,7 +15,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -44,7 +44,7 @@ void GeneTopoList::run(){
 void GeneTopoList::core(){
     if ( this->TipLabels.size() == 2 ) return;
     for ( size_t tip_i = 2; tip_i < this->TipLabels.size() ; tip_i++ ){
-        
+
         this->TreeList_tmp.clear();
         for ( size_t i = 0 ; i < this->TreeList.size(); i++ ){
             this->str_tmp = this->TreeList[i];
@@ -64,7 +64,7 @@ void GeneTopoList::core(){
                 }
             }
         }
-        
+
         this->TreeList.clear();
         this->TreeList = this->TreeList_tmp;
     }

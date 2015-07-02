@@ -45,9 +45,9 @@ class TestGeneTopoList : public CppUnit::TestCase {
         GeneTopoList testList6(v6);
         CPPUNIT_ASSERT (  testList6.TipLabels.size() == (unsigned)6 );
         CPPUNIT_ASSERT (  testList6.TreeList.size() == (unsigned)945 );
-        
+
     }
-    
+
     void testExtract(){
         GeneTopoList testList;
         string tree = "(((A,B),C),D);";
