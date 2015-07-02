@@ -52,14 +52,12 @@ void GeneTopoList::core(){
                 if ( isalpha( this->str_tmp[i_str_len] ) || isdigit( this->str_tmp[i_str_len]) ){
                     string label = extract_label( this->str_tmp, i_str_len);
                     string new_topo = add_new_taxa_at_tip( str_tmp, i_str_len, this->TipLabels[tip_i], label);
-                    GeneTopoListdout << new_topo << endl;
                     TreeList_tmp.push_back(new_topo);
                     i_str_len = label.size() + i_str_len;
                 }
                 else{
                     if ( this->str_tmp[i_str_len]==')' ){
                         string new_topo = add_new_taxa_at_int( str_tmp, i_str_len, this->TipLabels[tip_i]);
-                        GeneTopoListdout << new_topo << endl;
                         TreeList_tmp.push_back( new_topo );
                     }
                     i_str_len++;
@@ -88,6 +86,7 @@ size_t GeneTopoList::Parenthesis_balance_index_backwards( string &in_str, size_t
 void GeneTopoList::finalize(){
     for ( size_t i = 0 ; i < this->TreeList.size(); i++ ){
         this->TreeList[i] += ";";
+        GeneTopoListdout << this->TreeList[i] << endl;
     }
 }
 
@@ -144,6 +143,5 @@ void GeneTopoList::extract_TipLabels_from_TreeStr( string &in_str ){
 
 void GeneTopoList::init(){
     string init_topo = "(" + this->TipLabels[0] + "," + this->TipLabels[1] + ")";
-    GeneTopoListdout << init_topo << endl;
     this->TreeList.push_back ( init_topo );
 }
